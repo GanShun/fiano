@@ -9,6 +9,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/linuxboot/fiano/pkg/guid"
 )
@@ -83,6 +84,16 @@ var fileTypeNames = map[FVFileType]string{
 	FVFileTypeSMMCoreStandalone:  "EFI_FV_FILETYPE_MM_CORE_STANDALONE",
 }
 
+// NamesToFileType maps from common file type strings to the actual type.
+var NamesToFileType map[string]FVFileType
+
+func init() {
+	NamesToFileType = make(map[string]FVFileType)
+	for k, v := range fileTypeNames {
+		NamesToFileType[strings.TrimPrefix(v, "EFI_FV_FILETYPE_")] = k
+	}
+}
+
 // String creates a string representation for the file type.
 func (f FVFileType) String() string {
 	switch {
@@ -111,7 +122,7 @@ var (
 
 // FileAlignments specifies the correct alignments based on the field in the file header.
 var fileAlignments = []uint64{
-	// These alignments not computable, we have to look them up.
+	// These alignments are not computable, we have to look them up.
 	1,
 	16,
 	128,
